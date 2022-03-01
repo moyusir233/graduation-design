@@ -1,6 +1,3 @@
-[submodule "backend/dataCollection"]
-	path = backend/dataCollection
-	url = git@gitee.com:moyusir/data-collection.git
 [submodule "backend/dataProcessing"]
 	path = backend/dataProcessing
 	url = git@gitee.com:moyusir/data-processing.git
@@ -13,3 +10,6 @@
 [submodule "backend/test"]
 	path = backend/test
 	url = git@gitee.com:moyusir/test.git
+[submodule "backend/dataCollection"]
+	path = backend/dataCollection
+	url = git@gitee.com:moyusir/data-collection.git
