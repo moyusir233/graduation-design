@@ -1,0 +1,92 @@
+{{if .Values.testServer.kong}}
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{.Values.kong.name}}
+spec:
+  selector:
+    app: {{.Values.kong.name}}
+  ports:
+    - port: 8000
+      name: http-proxy
+      targetPort: 8000
+    - port: 9000
+      name: http2-proxy
+      targetPort: 9000
+    - port: 8001
+      name: api-admin
+      targetPort: 8001
+  type: ClusterIP
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{.Values.kong.name}}
+  labels:
+    app: kong
+spec:
+  replicas: 1
+  template:
+    metadata:
+      name: {{.Values.kong.name}}
+      labels:
+        app: kong
+    spec:
+      initContainers:
+        - name: init-kong-database
+          image: kong:2.7.1-alpine
+          imagePullPolicy: IfNotPresent
+          env:
+            - name: KONG_DATABASE
+              value: postgres
+            - name: KONG_PG_HOST
+              value: {{printf "%s.%s.svc.cluster.local" .Values.kongDatabase.name .Values.namespace}}
+            - name: KONG_PG_USER
+              value: {{.Values.kongDatabase.user}}
+            - name: KONG_PG_PASSWORD
+              value: {{.Values.kongDatabase.password}}
+          command: ['kong','migrations','bootstrap']
+      containers:
+        - name: {{.Values.kong.name}}
+          image: kong:2.7.1-alpine
+          imagePullPolicy: IfNotPresent
+          ports:
+            # http使用的proxy端口
+            - containerPort: 8000
+            # http2使用的proxy端口
+            - containerPort: 9000
+            # kong admin端口
+            - containerPort: 8001
+          env:
+            - name: KONG_DATABASE
+              value: postgres
+            - name: KONG_PG_HOST
+              value: {{printf "%s.%s.svc.cluster.local" .Values.kongDatabase.name .Values.namespace}}
+            - name: KONG_PG_USER
+              value: {{.Values.kongDatabase.user}}
+            - name: KONG_PG_PASSWORD
+              value: {{.Values.kongDatabase.password}}
+            - name: KONG_PROXY_ACCESS_LOG
+              value: /dev/stdout
+            - name: KONG_ADMIN_ACCESS_LOG
+              value: /dev/stdout
+            - name: KONG_PROXY_ERROR_LOG
+              value: /dev/stderr
+            - name: KONG_ADMIN_ERROR_LOG
+              value: /dev/stderr
+            - name: KONG_ADMIN_LISTEN
+              value: 0.0.0.0:8001
+            - name: KONG_NGINX_PROXY_LISTEN
+              # 为grpc连接设置listener
+              value: "0.0.0.0:9000 http2 reuseport backlog=16384"
+          readinessProbe:
+            httpGet:
+              port: 8001
+              path: /services
+            initialDelaySeconds: 20
+            periodSeconds: 10
+      restartPolicy: Always
+  selector:
+    matchLabels:
+      app: {{.Values.kong.name}}
+  {{end}}

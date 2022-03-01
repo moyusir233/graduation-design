@@ -1,0 +1,16 @@
+namespace: test
+kongDatabase:
+  name: kong-database
+  port: 5432
+  image: postgres:9.6
+  user: kong
+  password: kongpass
+  dbName: kong
+kong:
+  name: kong
+# 配置测试用的服务器是否需要开启
+testServer:
+  http: true
+  grpc: true
+  websocket: true
+  kong: true

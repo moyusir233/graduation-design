@@ -1,0 +1,57 @@
+{{if .Values.testServer.grpc}}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: config
+data:
+  {{- (.Files.Glob "config/*").AsConfig | nindent 2 }}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: grpc
+spec:
+  selector:
+    app: grpc
+  ports:
+    - port: 9000
+      targetPort: 9000
+      name: grpc
+  type: ClusterIP
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: grpc
+  labels:
+    app: grpc
+spec:
+  replicas: 1
+  template:
+    metadata:
+      name: grpc
+      labels:
+        app: grpc
+    spec:
+      volumes:
+        - name: conf
+          configMap:
+            name: config
+            items:
+              - key: grpc-config.yaml
+                path: config.yaml
+      containers:
+        - name: grpc
+          image: moyusir233/graduation-design:test-grpc-server
+          imagePullPolicy: Always
+          command: ["/app/testGrpcGateway","-conf","/data/config.yaml"]
+          ports:
+            - containerPort: 9000
+          volumeMounts:
+            - mountPath: /data/config.yaml
+              name: conf
+      restartPolicy: Always
+  selector:
+    matchLabels:
+      app: grpc
+{{end}}
