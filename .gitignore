@@ -143,4 +143,5 @@ dist
 ### others
 *.tar.gz
 cluster/key
+*.zip
 
