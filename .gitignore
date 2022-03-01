@@ -142,6 +142,6 @@ dist
 # vendor/
 ### others
 *.tar.gz
-cluster/init-cluster/key
+key/
 *.zip
 
