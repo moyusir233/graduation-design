@@ -1,0 +1,15 @@
+[submodule "backend/dataCollection"]
+	path = backend/dataCollection
+	url = git@gitee.com:moyusir/data-collection.git
+[submodule "backend/dataProcessing"]
+	path = backend/dataProcessing
+	url = git@gitee.com:moyusir/data-processing.git
+[submodule "backend/serviceCenter"]
+	path = backend/serviceCenter
+	url = git@gitee.com:moyusir/service-centre.git
+[submodule "backend/util"]
+	path = backend/util
+	url = git@gitee.com:moyusir/util.git
+[submodule "backend/test"]
+	path = backend/test
+	url = git@gitee.com:moyusir/test.git
