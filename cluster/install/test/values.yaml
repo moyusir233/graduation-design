@@ -11,6 +11,7 @@ kong:
 # 配置测试用的服务器是否需要开启
 testServer:
   http: true
-  grpc: true
-  websocket: true
+  grpc: false
+  websocket: false
   kong: true
+  autoTestServer: true

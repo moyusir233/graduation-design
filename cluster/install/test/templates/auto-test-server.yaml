@@ -1,0 +1,56 @@
+{{if .Values.testServer.autoTestServer}}
+apiVersion: v1
+kind: Service
+metadata:
+  name: auto-test-server
+spec:
+  selector:
+    app: auto-test-server
+  ports:
+    - port: 80
+      targetPort: 80
+      nodePort: 30000
+  type: NodePort
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: auto-test-server
+  labels:
+    app: auto-test-server
+spec:
+  replicas: 1
+  template:
+    metadata:
+      name: auto-test-server
+      labels:
+        app: auto-test-server
+    spec:
+      volumes:
+        - name: key
+          configMap:
+            name: key
+            # ssh密钥权限必须为0600
+            defaultMode: 0600
+        - name: shell
+          configMap:
+            name: init-shell
+            defaultMode: 0777
+            items:
+              - key: init.sh
+                path: init.sh
+      containers:
+        - name: auto-test-server
+          image: moyusir233/graduation-design:auto-test-server
+          imagePullPolicy: IfNotPresent
+          volumeMounts:
+            - mountPath: /root/.ssh
+              name: key
+            - mountPath: /init.sh
+              name: shell
+              subPath: init.sh
+      restartPolicy: Always
+  selector:
+    matchLabels:
+      app: auto-test-server
+  {{end}}

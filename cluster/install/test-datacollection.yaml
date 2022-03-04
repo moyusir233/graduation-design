@@ -34,21 +34,15 @@ spec:
 #            - sleep 3600
           env:
             - name: PROJECT_REPO_ADDRESS
-              value: "git@gitee.com:moyusir/util.git"
+              value: "git@gitee.com:moyusir/data-collection.git"
             - name: PROJECT_DIR
-              value: "util"
+              value: "data-collection"
             - name: TEST_PREFIX
-              value: "Test"
-            - name: USERNAME
-              value: "test"
-            - name: DEVICE_CLASS_COUNT
-              value: "5"
-            - name: SERVICE_NAME
-              value: "test"
-            - name: SERVICE_HOST
-              value: "nginx.test.svc.cluster.local"
-            - name: APP_DOMAIN_NAME
-              value: "kong.test.svc.cluster.local"
+              value: "TestRouteManager"
+            - name: BRANCH
+              value: "develop"
+            - name: TEST_PKG
+              value: "gitee.com/moyusir/dataCollection/internal/biz"
           volumeMounts:
             - mountPath: /root/.ssh
               name: key
