@@ -10,6 +10,10 @@ spec:
     - port: 80
       targetPort: 80
       nodePort: 30000
+    - port: 8000
+      targetPort: 8000
+    - port: 9000
+      targetPort: 9000
   type: NodePort
 ---
 apiVersion: apps/v1
@@ -43,6 +47,10 @@ spec:
         - name: auto-test-server
           image: moyusir233/graduation-design:auto-test-server
           imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 80
+            - containerPort: 8000
+            - containerPort: 9000
           volumeMounts:
             - mountPath: /root/.ssh
               name: key
