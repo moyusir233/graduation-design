@@ -68,6 +68,11 @@ spec:
               name: key
             - mountPath: /shell
               name: shell
+          readinessProbe:
+            initialDelaySeconds: 10
+            periodSeconds: 60
+            tcpSocket:
+              port: 80
       restartPolicy: Always
   selector:
     matchLabels:
