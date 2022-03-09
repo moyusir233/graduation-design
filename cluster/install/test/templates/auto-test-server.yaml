@@ -10,10 +10,17 @@ spec:
     - port: 80
       targetPort: 80
       nodePort: 30000
+      name: test-enter
+    - port: 2345
+      targetPort: 2345
+      nodePort: 32345
+      name: debug
     - port: 8000
       targetPort: 8000
+      name: http
     - port: 9000
       targetPort: 9000
+      name: grpc
   type: NodePort
 ---
 apiVersion: apps/v1
@@ -38,25 +45,29 @@ spec:
             defaultMode: 0600
         - name: shell
           configMap:
-            name: init-shell
+            name: shell
             defaultMode: 0777
             items:
               - key: init.sh
                 path: init.sh
+              - key: test.sh
+                path: test.sh
+              - key: debug.sh
+                path: debug.sh
       containers:
         - name: auto-test-server
           image: moyusir233/graduation-design:auto-test-server
           imagePullPolicy: IfNotPresent
           ports:
             - containerPort: 80
+            - containerPort: 2345
             - containerPort: 8000
             - containerPort: 9000
           volumeMounts:
             - mountPath: /root/.ssh
               name: key
-            - mountPath: /init.sh
+            - mountPath: /shell
               name: shell
-              subPath: init.sh
       restartPolicy: Always
   selector:
     matchLabels:

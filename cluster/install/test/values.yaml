@@ -10,7 +10,7 @@ kong:
   name: kong
 # 配置测试用的服务器是否需要开启
 testServer:
-  http: true
+  http: false
   grpc: false
   websocket: false
   kong: true

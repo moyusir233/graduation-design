@@ -10,7 +10,7 @@ data:
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: init-shell
+  name: shell
   namespace: test
 data:
   {{- (.Files.Glob "shell/*").AsConfig | nindent 2 }}
