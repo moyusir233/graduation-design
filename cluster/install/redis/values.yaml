@@ -150,7 +150,6 @@ master:
   ## ref: https://redis.io/topics/security#disabling-of-specific-commands
   ##
   disableCommands:
-    - FLUSHDB
     - FLUSHALL
   ## @param master.command Override default container command (useful when using custom images)
   ##
@@ -494,7 +493,6 @@ replica:
   ## ref: https://redis.io/topics/security#disabling-of-specific-commands
   ##
   disableCommands:
-    - FLUSHDB
     - FLUSHALL
   ## @param replica.command Override default container command (useful when using custom images)
   ##
