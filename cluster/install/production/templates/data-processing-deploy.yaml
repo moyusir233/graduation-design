@@ -1,0 +1,134 @@
+# 数据处理服务的部署模板
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{.Values.username}}-dp
+  labels:
+    user: {{.Values.username}}
+spec:
+  selector:
+    app: {{.Values.username}}-dp
+    user: {{.Values.username}}
+  ports:
+    - port: 8000
+  type: ClusterIP
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{.Values.username}}-dp
+  labels:
+    app: {{.Values.username}}-dp
+    user: {{.Values.username}}
+spec:
+  replicas: 1
+  template:
+    metadata:
+      name: {{.Values.username}}-dp
+      labels:
+        app: {{.Values.username}}-dp
+        user: {{.Values.username}}
+    spec:
+      volumes:
+        # 初始化环境使用的脚本
+        - name: shell
+          configMap:
+            name: shell
+            defaultMode: 0777
+            items:
+              - key: build.sh
+                path: build.sh
+        # 拉取gitee私有仓库使用的ssh密钥
+        - name: key
+          configMap:
+            name: key
+            defaultMode: 0600
+        # 放置二进制可执行程序的中转目录
+        - name: tmp
+          emptyDir: {}
+        # 生成的代码也以configMap的形式挂载进去，由服务中心处理注册请求后动态创建
+        - name: generated-code
+          configMap:
+            name: {{.Values.username}}-dp-code
+        # 程序运行时使用的配置文件以及用户状态的注册信息，将数据处理使用的通用配置的cm
+        # 和服务中心动态生成的保存设备状态注册信息的cm联合挂载到容器同一目录下
+        - name: config
+          projected:
+            sources:
+              # 数据处理服务使用的通用配置文件
+              - configMap:
+                  name: config
+                  items:
+                    - key: dp-config.yaml
+                      path: config.yaml
+             # 数据处理服务使用的通用配置文件
+              - configMap:
+                  name: {{.Values.username}}-state-register-info
+      initContainers:
+        - name: build
+          image: golang:1.17
+          imagePullPolicy: IfNotPresent
+          command: ["/shell/build.sh"]
+          volumeMounts:
+            # 执行编译使用的脚本
+            - mountPath: /shell
+              name: shell
+            # 拉取代码使用的公钥
+            - mountPath: /root/.ssh
+              name: key
+            # 放置编译后得到的二进制可执行程序的共享目录
+            - mountPath: /app
+              name: tmp
+            # 由服务中心生成的代码
+            - mountPath: /generated-code
+              name: generated-code
+          # 执行编译脚本所需要的环境变量
+          env:
+            # 项目代码文件的仓库地址
+            - name: PROJECT_REPO_ADDRESS
+              value:
+            # 需要拉取的分支名字
+            - name: PROJECT_BRANCH
+              value:
+            # 项目目录名称
+            - name: PROJECT_DIR
+              value:
+            # 相对于项目根目录的，存放项目protobuf服务定义文件的目录的相对路径
+            - name: PROJECT_API_DIR
+              value:
+            # 相对于项目根目录的，存放项目service层源代码的目录的相对路径
+            - name: PROJECT_SERVICE_DIR
+              value:
+      containers:
+        - name: {{.Values.username}}-dp
+          image: moyusir233/graduation-design:data-processing
+          imagePullPolicy: IfNotPresent
+          volumeMounts:
+            # 存放编译后得到的二进制可执行程序的目录
+            - mountPath: /app
+              name: tmp
+            # 应用运行所需的配置文件目录
+            - mountPath: /etc/app-configs
+              name: config
+          # 服务运行所需的环境变量
+          env:
+            # 服务对象的用户id
+            - name: USERNAME
+              value: {{.Values.username}}
+          ports:
+            - containerPort: 8000
+          livenessProbe:
+            initialDelaySeconds: 10
+            periodSeconds: 60
+            tcpSocket:
+              port: 8000
+          readinessProbe:
+            initialDelaySeconds: 10
+            periodSeconds: 60
+            tcpSocket:
+              port: 8000
+      restartPolicy: Always
+  selector:
+    matchLabels:
+      app: {{.Values.username}}-dp
+      user: {{.Values.username}}

@@ -1,0 +1,13 @@
+server:
+  http:
+    addr: 0.0.0.0:8000
+    timeout: 60s
+data:
+  redis:
+    host: production-redis.production.svc.cluster.local
+    serverPort: 6379
+    sentinelPort: 26379
+    masterName: mymaster
+    poolSize: 5
+    minIdleConns: 2
+  deviceStateRegisterInfo: /etc/app-configs/register_info.json

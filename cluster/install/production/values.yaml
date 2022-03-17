@@ -1,0 +1,10 @@
+namespace: production
+kongDatabase:
+  name: kong-database
+  port: 5432
+  image: postgres:9.6
+  user: kong
+  password: kongpass
+  dbName: kong
+kong:
+  name: kong
