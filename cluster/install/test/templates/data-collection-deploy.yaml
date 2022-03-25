@@ -1,3 +1,4 @@
+{{if false}}
 # 数据收集服务部署的模板
 # 用于提供负责均衡服务而定义的service
 apiVersion: v1
@@ -62,69 +63,49 @@ spec:
         user: {{.Values.username}}
     spec:
       volumes:
-        # 初始化环境使用的脚本
-        - name: shell
-          configMap:
-            name: shell
-            defaultMode: 0777
-            items:
-              - key: build.sh
-                path: build.sh
-        # 拉取gitee私有仓库使用的ssh密钥
-        - name: key
-          configMap:
-            name: key
-            defaultMode: 0600
         # 放置二进制可执行程序的中转目录
-        - name: tmp
+        - name: app
           emptyDir: {}
-        # 生成的代码也以configMap的形式挂载进去，由服务中心处理注册请求后动态创建
-        - name: generated-code
+        # 为了向编译中心发出编译请求，需要使用的用户的注册信息，json形式，注册时动态创建
+        - name: register-info
           configMap:
-            name: {{.Values.username}}-dc-code
+            name: {{.Values.username}}-register-info
         # 数据收集服务运行时使用的配置文件
         - name: config
           configMap:
             name: config
             items:
-              - key: dc-config.yaml
+              - key: data-collection-config.yaml
                 path: config.yaml
-      # TODO 在statefulSet中，利用initContainer使每个pod都拉取代码然后进行编译，造成了同样代码的重复编译，如何解决？
+      # 向编译中心拉取可执行文件的客户端容器，本质上就是个grpc客户端
       initContainers:
         - name: build
-          image: golang:1.17
+          image: moyusir233/graduation-design:compilation-client
           imagePullPolicy: IfNotPresent
-          command: ["/shell/build.sh"]
+          # 运行需要的参数
+          args:
+            - -u # 用户名
+            - {{.Values.username}}
+            - -address #编译中心地址
+            - compilation-center.production.svc.cluster.local:9000
+            # 保存用户注册信息json文件的路径
+            - -state
+            - /etc/register-info/state.json
+            - -config
+            - /etc/register-info/config.json
+            # 下载得到的编译文件保存的路径，保存到emptyDir对应的目录下的server文件中
+            - -o
+            - /app/server
+            # 拉取的代码类型，dc或dp，对应数据收集服务和数据处理服务
+            - -service_type
+            - dc
           volumeMounts:
-            # 执行编译使用的脚本
-            - mountPath: /shell
-              name: shell
-            # 拉取代码使用的公钥
-            - mountPath: /root/.ssh
-              name: key
             # 放置编译后得到的二进制可执行程序的共享目录
             - mountPath: /app
-              name: tmp
-            # 由服务中心生成的代码
-            - mountPath: /generated-code
-              name: generated-code
-          # 执行编译脚本所需要的环境变量
-          env:
-            # 项目代码文件的仓库地址
-            - name: PROJECT_REPO_ADDRESS
-              value:
-            # 需要拉取的分支名字
-            - name: PROJECT_BRANCH
-              value:
-            # 项目目录名称
-            - name: PROJECT_DIR
-              value:
-            # 相对于项目根目录的，存放项目protobuf服务定义文件的目录的相对路径
-            - name: PROJECT_API_DIR
-              value:
-            # 相对于项目根目录的，存放项目service层源代码的目录的相对路径
-            - name: PROJECT_SERVICE_DIR
-              value:
+              name: app
+            # 用户的注册信息
+            - mountPath: /etc/register-info
+              name: register-info
       containers:
         - name: {{.Values.username}}-dc
           image: moyusir233/graduation-design:data-collection
@@ -151,7 +132,7 @@ spec:
               value: {{.Values.username}}-dc-headless
             # 项目使用的域名，用于服务向网关注册路由时，增加Host请求头的匹配规则
             - name: APP_DOMAIN_NAME
-              value:
+              value: gd-k8s-master01
           ports:
             - containerPort: 8000
             - containerPort: 9000
@@ -166,3 +147,4 @@ spec:
             tcpSocket:
               port: 8000
       restartPolicy: Always
+  {{end}}
