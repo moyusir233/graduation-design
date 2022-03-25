@@ -1,0 +1,15 @@
+[
+  {
+    "enabled": true,
+    "config": {
+      "add": {
+        "headers": [
+          "Access-Control-Allow-Origin: *",
+          "Access-Control-Allow-Methods: GET,POST,DELETE",
+          "Access-Control-Allow-Headers: X-Api-Key,X-Device-ID,X-Service-Type,DNT,Keep-Alive,User-Agent,If-Modified-Since,Cache-Control,Content-Type,Authorization,Content-Disposition",
+          "Access-Control-Max-Age: 1728000"
+        ]
+      }
+    }
+  }
+]

@@ -1,0 +1,17 @@
+[
+  {
+    "enabled": true,
+    "service": null,
+    "route": {
+      "name": "service-centerclient-code"
+    },
+    "consumer": null,
+    "config": {
+      "key_names": [
+        "X-Api-Key"
+      ],
+      "key_in_header": true,
+      "key_in_query": true
+    }
+  }
+]

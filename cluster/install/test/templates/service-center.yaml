@@ -1,0 +1,55 @@
+{{if .Values.testServer.serviceCenter}}
+apiVersion: v1
+kind: Service
+metadata:
+  name: service-center
+spec:
+  selector:
+    app: service-center
+  ports:
+    - port: 8000
+  type: ClusterIP
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: service-center
+  labels:
+    app: service-center
+spec:
+  replicas: 1
+  template:
+    metadata:
+      name: service-center
+      labels:
+        app: service-center
+    spec:
+      volumes:
+        - name: config
+          configMap:
+            name: config
+            items:
+              - key: service-center-config.yaml
+                path: config.yaml
+      containers:
+        - name: service-center
+          image: moyusir233/graduation-design:service-center
+          imagePullPolicy: IfNotPresent
+          volumeMounts:
+            - mountPath: /etc/app-configs
+              name: config
+          ports:
+            - containerPort: 8000
+          readinessProbe:
+            periodSeconds: 30
+            tcpSocket:
+              port: 8000
+          livenessProbe:
+            periodSeconds: 30
+            tcpSocket:
+              port: 8000
+      restartPolicy: Always
+  selector:
+    matchLabels:
+      app: service-center
+  {{end}}

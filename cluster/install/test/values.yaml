@@ -1,4 +1,5 @@
 namespace: test
+username: test
 kongDatabase:
   name: kong-database
   port: 5432
@@ -10,8 +11,11 @@ kong:
   name: kong
 # 配置测试用的服务器是否需要开启
 testServer:
-  http: false
+  nginx: true
   grpc: false
   websocket: false
   kong: true
-  autoTestServer: true
+  autoTestServer: false
+  compilationCenter: true
+  serviceCenter: true
+  initCluster: true
