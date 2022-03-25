@@ -144,4 +144,5 @@ dist
 *.tar.gz
 key/
 *.zip
+protoc/
 

@@ -1,4 +1,24 @@
 {{if .Values.testServer.kong}}
+# 暴露出集群外部使用的反向代理端口
+apiVersion: v1
+kind: Service
+metadata:
+  name: kong-proxy
+spec:
+  selector:
+    app: {{.Values.kong.name}}
+  ports:
+    - port: 8000
+      name: http-proxy
+      targetPort: 8000
+      nodePort: 30000
+    - port: 9000
+      name: http2-proxy
+      targetPort: 9000
+      nodePort: 31000
+  type: NodePort
+---
+# 集群内部使用的kong admin端口
 apiVersion: v1
 kind: Service
 metadata:
@@ -7,12 +27,6 @@ spec:
   selector:
     app: {{.Values.kong.name}}
   ports:
-    - port: 8000
-      name: http-proxy
-      targetPort: 8000
-    - port: 9000
-      name: http2-proxy
-      targetPort: 9000
     - port: 8001
       name: api-admin
       targetPort: 8001

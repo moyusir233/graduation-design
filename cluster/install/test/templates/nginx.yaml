@@ -1,4 +1,4 @@
-{{if .Values.testServer.http}}
+{{if .Values.testServer.nginx}}
 apiVersion: v1
 kind: Service
 metadata:
@@ -18,11 +18,31 @@ metadata:
   labels:
     app: nginx
 spec:
+  volumes:
+    - name: config
+      configMap:
+        name: config
+        items:
+          - key: nginx.conf
+            path: nginx.conf
   containers:
     - name: nginx
       image: nginx
       imagePullPolicy: IfNotPresent
+      volumeMounts:
+        - mountPath: /etc/nginx/conf.d
+          name: config
       ports:
         - containerPort: 80
+      livenessProbe:
+        periodSeconds: 60
+        httpGet:
+          port: 80
+          path: /options
+      readinessProbe:
+        periodSeconds: 20
+        httpGet:
+          port: 80
+          path: /options
   restartPolicy: Always
 {{end}}

@@ -38,6 +38,10 @@ spec:
         app: auto-test-server
     spec:
       volumes:
+        - name: protoc
+          hostPath:
+            path: /root/k8s-install/protobuf/protoc
+            type: File
         - name: key
           configMap:
             name: key
@@ -54,6 +58,8 @@ spec:
                 path: test.sh
               - key: debug.sh
                 path: debug.sh
+              - key: build.sh
+                path: build.sh
       containers:
         - name: auto-test-server
           image: moyusir233/graduation-design:auto-test-server
@@ -64,13 +70,15 @@ spec:
             - containerPort: 8000
             - containerPort: 9000
           volumeMounts:
+            - mountPath: /bin/protoc
+              name: protoc
             - mountPath: /root/.ssh
               name: key
             - mountPath: /shell
               name: shell
           readinessProbe:
             initialDelaySeconds: 10
-            periodSeconds: 60
+            periodSeconds: 10
             tcpSocket:
               port: 80
       restartPolicy: Always

@@ -13,5 +13,5 @@ cd "${PROJECT_DIR}" || exit
 # 使用不经过alias的cp指令，强制令生成的代码文件覆盖原始的代码文件
 /bin/cp -f /generated-code/*.proto "${PROJECT_API_DIR}"
 /bin/cp -f /generated-code/*.go "${PROJECT_SERVICE_DIR}"
-make init && make api && make build
+make init && make api && make build || exit
 cp bin/"$(ls bin)" /app/server
