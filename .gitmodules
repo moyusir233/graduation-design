@@ -1,15 +1,28 @@
 [submodule "backend/dataProcessing"]
 	path = backend/dataProcessing
 	url = git@gitee.com:moyusir/data-processing.git
+	branch = master
 [submodule "backend/serviceCenter"]
 	path = backend/serviceCenter
 	url = git@gitee.com:moyusir/service-centre.git
+	branch = master
 [submodule "backend/util"]
 	path = backend/util
 	url = git@gitee.com:moyusir/util.git
+	branch = master
 [submodule "backend/test"]
 	path = backend/test
 	url = git@gitee.com:moyusir/test.git
+	branch = master
 [submodule "backend/dataCollection"]
 	path = backend/dataCollection
 	url = git@gitee.com:moyusir/data-collection.git
+	branch = master
+[submodule "backend/compilation-center"]
+	path = backend/compilation-center
+	url = git@gitee.com:moyusir/compilation-center.git
+	branch = master
+[submodule "backend/client"]
+	path = backend/client
+	url = git@gitee.com:moyusir/client.git
+	branch = master
