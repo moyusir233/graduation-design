@@ -11,7 +11,11 @@ server:
     namespace: test
   compilationCenter:
     address: compilation-center.test.svc.cluster.local:9000
-  appDomainName: kong.test.svc.cluster.local
+  appDomainName: gd-k8s-master01
+  influxdb:
+    serverUrl: http://influxdb.test.svc.cluster.local:8086
+    authToken: test
+    org: test
 data:
   redis:
     host: test-redis.test.svc.cluster.local

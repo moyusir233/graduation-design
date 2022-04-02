@@ -33,7 +33,7 @@ spec:
                 path: config.yaml
       containers:
         - name: service-center
-          image: moyusir233/graduation-design:service-center
+          image: moyusir233/graduation-design:service-center-influxdb
           imagePullPolicy: IfNotPresent
           volumeMounts:
             - mountPath: /etc/app-configs

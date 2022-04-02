@@ -166,8 +166,8 @@ master:
   ##  - "--maxmemory-policy volatile-ttl"
   ##  - "--repl-backlog-size 1024mb"
   ##
-  extraFlags:
-    - "--loadmodule /redistimeseries.so"
+  extraFlags: []
+#    - "--loadmodule /redistimeseries.so"
   ## @param master.extraEnvVars Array with extra environment variables to add to Redis&trade; master nodes
   ## e.g:
   ## extraEnvVars:
@@ -351,16 +351,16 @@ master:
   lifecycleHooks: {}
   ## @param master.extraVolumes Optionally specify extra list of additional volumes for the Redis&trade; master pod(s)
   ##
-  extraVolumes:
-    - name: ts
-      hostPath:
-       path: "/root/k8s-install/redis-modules/redistimeseries.so"
-       type: File
+  extraVolumes: []
+#    - name: ts
+#      hostPath:
+#       path: "/root/k8s-install/redis-modules/redistimeseries.so"
+#       type: File
   ## @param master.extraVolumeMounts Optionally specify extra list of additional volumeMounts for the Redis&trade; master container(s)
   ##
-  extraVolumeMounts:
-    - name: ts
-      mountPath: /redistimeseries.so
+  extraVolumeMounts: []
+#    - name: ts
+#      mountPath: /redistimeseries.so
   ## @param master.sidecars Add additional sidecar containers to the Redis&trade; master pod(s)
   ## e.g:
   ## sidecars:
@@ -483,7 +483,7 @@ master:
 replica:
   ## @param replica.replicaCount Number of Redis&trade; replicas to deploy
   ##
-  replicaCount: 3
+  replicaCount: 1
   ## @param replica.configuration Configuration for Redis&trade; replicas nodes
   ## ref: https://redis.io/topics/config
   ##
@@ -509,8 +509,8 @@ replica:
   ##  - "--maxmemory-policy volatile-ttl"
   ##  - "--repl-backlog-size 1024mb"
   ##
-  extraFlags:
-    - "--loadmodule /redistimeseries.so"
+  extraFlags: []
+#    - "--loadmodule /redistimeseries.so"
   ## @param replica.extraEnvVars Array with extra environment variables to add to Redis&trade; replicas nodes
   ## e.g:
   ## extraEnvVars:
@@ -710,16 +710,16 @@ replica:
   lifecycleHooks: {}
   ## @param replica.extraVolumes Optionally specify extra list of additional volumes for the Redis&trade; replicas pod(s)
   ##
-  extraVolumes:
-    - name: ts
-      hostPath:
-       path: "/root/k8s-install/redis-modules/redistimeseries.so"
-       type: File
+  extraVolumes: []
+#    - name: ts
+#      hostPath:
+#       path: "/root/k8s-install/redis-modules/redistimeseries.so"
+#       type: File
   ## @param replica.extraVolumeMounts Optionally specify extra list of additional volumeMounts for the Redis&trade; replicas container(s)
   ##
-  extraVolumeMounts:
-    - name: ts
-      mountPath: /redistimeseries.so
+  extraVolumeMounts: []
+#    - name: ts
+#      mountPath: /redistimeseries.so
   ## @param replica.sidecars Add additional sidecar containers to the Redis&trade; replicas pod(s)
   ## e.g:
   ## sidecars:

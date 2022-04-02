@@ -50,7 +50,7 @@ spec:
             name: data-processing-template
       containers:
         - name: compilation-center
-          image: moyusir233/graduation-design:compilation-center
+          image: moyusir233/graduation-design:compilation-center-influxdb
           imagePullPolicy: IfNotPresent
           volumeMounts:
             - mountPath: /bin/protoc

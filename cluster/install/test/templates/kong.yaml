@@ -98,7 +98,7 @@ spec:
               port: 8001
               path: /services
             initialDelaySeconds: 20
-            periodSeconds: 10
+            periodSeconds: 60
       restartPolicy: Always
   selector:
     matchLabels:

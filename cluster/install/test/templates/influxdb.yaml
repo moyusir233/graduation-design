@@ -1,0 +1,55 @@
+{{if .Values.testServer.influxdb}}
+apiVersion: v1
+kind: Service
+metadata:
+  name: influxdb
+spec:
+  selector:
+    app: influxdb
+  ports:
+    - port: 8086
+  type: ClusterIP
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: influxdb
+  labels:
+    app: influxdb
+spec:
+  replicas: 1
+  template:
+    metadata:
+      name: influxdb
+      labels:
+        app: influxdb
+    spec:
+      containers:
+        - name: influxdb
+          image: influxdb:2.1.1
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 8086
+          # 设置初始化influxdb需要的环境变量
+          env:
+            - name: DOCKER_INFLUXDB_INIT_MODE
+              value: setup
+            - name: DOCKER_INFLUXDB_INIT_USERNAME
+              value: test
+            - name: DOCKER_INFLUXDB_INIT_PASSWORD
+              value: testPassword123
+            - name: DOCKER_INFLUXDB_INIT_ORG
+              value: test
+            - name: DOCKER_INFLUXDB_INIT_BUCKET
+              value: init_bucket
+            - name: DOCKER_INFLUXDB_INIT_ADMIN_TOKEN
+              value: test
+          readinessProbe:
+            httpGet:
+              port: 8086
+              path: /ready
+      restartPolicy: Always
+  selector:
+    matchLabels:
+      app: influxdb
+  {{end}}

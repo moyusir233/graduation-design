@@ -122,17 +122,6 @@ spec:
             # 服务对象的用户id
             - name: USERNAME
               value: {{.Values.username}}
-            # pod用于向kong网关注册服务时使用的名称
-            - name: SERVICE_NAME
-              valueFrom:
-                fieldRef:
-                  fieldPath: metadata.name
-            # statefulSet使用的headless service的名称，用于给pod组建域名
-            - name: HEADLESS_SERVICE_NAME
-              value: {{.Values.username}}-dc-headless
-            # 项目使用的域名，用于服务向网关注册路由时，增加Host请求头的匹配规则
-            - name: APP_DOMAIN_NAME
-              value: gd-k8s-master01
           ports:
             - containerPort: 8000
             - containerPort: 9000

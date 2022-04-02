@@ -64,6 +64,10 @@ spec:
         - name: auto-test-server
           image: moyusir233/graduation-design:auto-test-server
           imagePullPolicy: IfNotPresent
+{{/*          command:*/}}
+{{/*            - /bin/bash*/}}
+{{/*            - -c*/}}
+{{/*            - sleep 3600*/}}
           ports:
             - containerPort: 80
             - containerPort: 2345
