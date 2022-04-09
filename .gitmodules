@@ -26,3 +26,7 @@
 	path = backend/client
 	url = git@gitee.com:moyusir/client.git
 	branch = master
+[submodule "frontend"]
+	path = frontend
+	url = git@gitee.com:moyusir/frontend.git
+	branch = master
