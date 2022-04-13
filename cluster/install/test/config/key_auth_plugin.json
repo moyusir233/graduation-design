@@ -3,7 +3,7 @@
     "enabled": true,
     "service": null,
     "route": {
-      "name": "service-centerclient-code"
+      "name": "private-service-route"
     },
     "consumer": null,
     "config": {

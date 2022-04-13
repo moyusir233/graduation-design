@@ -21,7 +21,7 @@
     }
   },
   {
-    "name": "service-centerclient-code",
+    "name": "private-service-route",
     "protocols": [
       "http"
     ],
@@ -32,7 +32,8 @@
       "gd-k8s-master01"
     ],
     "paths": [
-      "/users/client-code"
+      "/users/client-code",
+      "/users/register-info/"
     ],
     "strip_path": false,
     "service": {
