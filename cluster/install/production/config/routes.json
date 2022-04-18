@@ -1,0 +1,81 @@
+[
+  {
+    "name": "service-center",
+    "protocols": [
+      "http"
+    ],
+    "methods": [
+      "GET",
+      "POST",
+      "DELETE"
+    ],
+    "hosts": [
+      "gd-k8s-master01"
+    ],
+    "paths": [
+      "/users"
+    ],
+    "strip_path": false,
+    "service": {
+      "name": "service-center"
+    }
+  },
+  {
+    "name": "private-service-route",
+    "protocols": [
+      "http"
+    ],
+    "methods": [
+      "GET"
+    ],
+    "hosts": [
+      "gd-k8s-master01"
+    ],
+    "paths": [
+      "/users/client-code",
+      "/users/register-info/"
+    ],
+    "strip_path": false,
+    "service": {
+      "name": "service-center"
+    }
+  },
+  {
+    "name": "nginx-options",
+    "protocols": [
+      "http"
+    ],
+    "methods": [
+      "OPTIONS"
+    ],
+    "hosts": [
+      "gd-k8s-master01"
+    ],
+    "paths": [
+      "/"
+    ],
+    "strip_path": true,
+    "service": {
+      "name": "nginx-options"
+    }
+  },
+  {
+    "name": "nginx",
+    "protocols": [
+      "http"
+    ],
+    "methods": [
+      "GET"
+    ],
+    "hosts": [
+      "gd-k8s-master01"
+    ],
+    "paths": [
+      "/static/"
+    ],
+    "strip_path": true,
+    "service": {
+      "name": "nginx"
+    }
+  }
+]

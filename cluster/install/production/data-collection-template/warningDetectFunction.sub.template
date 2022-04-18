@@ -1,0 +1,124 @@
+{{/* 预定义的，故障预警相关服务函数的子模板，包括grpc的服务函数和go service层的函数 */}}
+
+{{/* go函数部分 */}}
+
+{{/* 定义创建设备状态流函数的模板，需要注入DeviceClassID
+// CreateStateInfoSaveStream 创建传输设备状态信息的数据流
+// 程序会优先使用请求头中包含的clientID进行路由信息的创建，
+// 当请求头中不包含clientID时，则会重新建立一个clientID。
+// 本次数据流中使用的clientID会通过响应头发送给客户端
+*/}}
+{{define "CreateStateInfoSaveStream" -}}
+func (s *WarningDetectService) CreateStateInfoSaveStream{{.DeviceClassID}}(conn pb.WarningDetect_CreateStateInfoSaveStream{{.DeviceClassID}}Server) error {
+	var (
+		clientID string
+		// 设备类别号，代码生成时注入
+		deviceClassID = {{.DeviceClassID}}
+		// 设备预警字段，代码生成时注入
+		fields = map[string]float64{
+		{{range .Fields -}}
+		{{if .Warning}}
+			"{{.Name}}": 0,
+		{{end}}
+        {{- end}}
+		}
+		// 设备非时间，非id的非预警字段，代码生成时注入
+		tags = map[string]string{
+		{{range .Fields -}}
+		{{if and (not .Warning) (ne .Name "time") (ne .Name "id")}}
+			"{{.Name}}": "",
+		{{end}}
+		{{- end}}
+		}
+	)
+
+	// 检查请求头中是否包含clientID
+	md, ok := metadata.FromIncomingContext(conn.Context())
+	if value := md.Get(CLIENT_ID_HEADER); ok && len(value) != 0 {
+		clientID = value[0]
+	} else {
+		// 若请求头中不存在，则申请创建新的clientID，通过响应头并发送给客户端
+		id, err := s.updater.CreateClientID()
+		if err != nil {
+			return err
+		} else {
+			clientID = id
+		}
+		// 将clientID存放到响应头中发送
+		md = metadata.New(map[string]string{CLIENT_ID_HEADER: clientID})
+		err = conn.SendHeader(md)
+		// TODO 考虑错误处理
+		if err != nil {
+			return errors.Newf(
+				500, "Service_State_Error", "发送grpc请求头时发生了错误:%v", err)
+		}
+	}
+
+	s.logger.Infof("与 %v 建立了传输设备状态信息的grpc流", clientID)
+
+	for {
+		var (
+			state *pb.DeviceState{{.DeviceClassID}}
+			err   error
+		)
+		recvCtx, cancel := context.WithCancel(context.Background())
+		go func() {
+			defer cancel()
+			state, err = conn.Recv()
+		}()
+
+		select {
+		case <-conn.Context().Done():
+			s.logger.Infof("关闭了 %v 的传输设备状态信息的grpc流", clientID)
+			return nil
+		case <-recvCtx.Done():
+			if err == io.EOF {
+				s.logger.Infof("关闭了 %v 的传输设备状态信息的grpc流", clientID)
+				return nil
+			}
+			if err != nil {
+				return errors.Newf(
+					500, "Service_State_Error",
+					"接收用户 %v 传输的设备状态信息时发生了错误:%v", clientID, err)
+			}
+			// 提取设备状态信息进行路由激活以及保存
+			info := &biz.DeviceGeneralInfo{DeviceClassID: deviceClassID}
+			info.DeviceID = state.Id
+
+		{{range .Fields}}
+			{{if .Warning}}
+			fields["{{.Name}}"] = float64(state.{{camelCase .Name}})
+			{{else if and (ne .Name "time") (ne .Name "id")}}
+			tags["{{.Name}}"] = fmt.Sprintf("%v",state.{{camelCase .Name}})
+			{{end}}
+		{{end}}
+
+			// TODO 考虑路由激活以及保存设备状态出错时如何处理
+			err = s.updater.ConnectDeviceAndClientID(clientID, info)
+			if err != nil {
+				return err
+			}
+			err = s.uc.SaveDeviceState(info, state.Time.AsTime(), fields, tags)
+			if err != nil {
+				return err
+			}
+
+			err = conn.Send(&pb.WarningDetectServiceReply{Success: true})
+			if err != nil {
+				return errors.Newf(
+					500, "Service_State_Error",
+					"向用户 %v 发送传输设备状态的响应信息时发生了错误:%v", clientID, err)
+			}
+		}
+	}
+}
+{{- end}}
+
+{{/* grpc服务部分 */}}
+
+{{/* 创建设备状态保存流函数的服务定义模板，需要注入DeviceClassID
+// 设备状态信息收集服务
+*/}}
+{{define "CreateStateInfoSaveStreamProto" -}}
+rpc CreateStateInfoSaveStream{{.DeviceClassID}}(stream DeviceState{{.DeviceClassID}}) returns (stream WarningDetectServiceReply);
+{{- end}}

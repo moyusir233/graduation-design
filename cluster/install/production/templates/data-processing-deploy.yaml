@@ -1,0 +1,121 @@
+{{if false}}
+# 数据处理服务的部署模板
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{.Values.username}}-dp
+  labels:
+    user: {{.Values.username}}
+spec:
+  selector:
+    app: {{.Values.username}}-dp
+    user: {{.Values.username}}
+  ports:
+    - port: 8000
+      name: "http"
+  type: ClusterIP
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{.Values.username}}-dp
+  labels:
+    app: {{.Values.username}}-dp
+    user: {{.Values.username}}
+spec:
+  replicas: 1
+  template:
+    metadata:
+      name: {{.Values.username}}-dp
+      labels:
+        app: {{.Values.username}}-dp
+        user: {{.Values.username}}
+    spec:
+      volumes:
+        # 放置二进制可执行程序的中转目录
+        - name: app
+          emptyDir: {}
+          # 为了向编译中心发出编译请求，需要使用的用户的注册信息，json形式，注册时动态创建
+        - name: register-info
+          configMap:
+            name: {{.Values.username}}-register-info
+        # 程序运行时使用的配置文件以及用户状态的注册信息，将数据处理使用的通用配置的cm
+        # 和服务中心动态生成的保存设备状态注册信息的cm联合挂载到容器同一目录下
+        - name: config
+          projected:
+            sources:
+              # 数据处理服务使用的通用配置文件
+              - configMap:
+                  name: config
+                  items:
+                    - key: data-processing-config.yaml
+                      path: config.yaml
+             # 用户设备状态的注册信息
+              - configMap:
+                  name: {{.Values.username}}-register-info
+                  items:
+                    - key: state.json
+                      path: register_info.json
+      # 向编译中心拉取可执行文件的客户端容器，本质上就是个grpc客户端
+      initContainers:
+        - name: build
+          image: moyusir233/graduation-design:compilation-client
+          imagePullPolicy: IfNotPresent
+          # 运行需要的参数
+          args:
+            - -u # 用户名
+            - {{.Values.username}}
+            - -address #编译中心地址
+            - compilation-center.production.svc.cluster.local:9000
+            # 保存用户注册信息json文件的路径
+            - -state
+            - /etc/register-info/state.json
+            - -config
+            - /etc/register-info/config.json
+            # 下载得到的编译文件保存的路径，保存到emptyDir对应的目录下的server文件中
+            - -o
+            - /app/server
+            # 拉取的代码类型，dc或dp，对应数据收集服务和数据处理服务
+            - -service_type
+            - dp
+          volumeMounts:
+            # 放置编译后得到的二进制可执行程序的共享目录
+            - mountPath: /app
+              name: app
+            # 用户的注册信息
+            - mountPath: /etc/register-info
+              name: register-info
+      containers:
+        - name: {{.Values.username}}-dp
+          image: moyusir233/graduation-design:data-processing
+          imagePullPolicy: IfNotPresent
+          volumeMounts:
+            # 存放编译后得到的二进制可执行程序的目录
+            - mountPath: /app
+              name: app
+            # 应用运行所需的配置文件目录
+            - mountPath: /etc/app-configs
+              name: config
+          # 服务运行所需的环境变量
+          env:
+            # 服务对象的用户id
+            - name: USERNAME
+              value: {{.Values.username}}
+          ports:
+            - containerPort: 8000
+          livenessProbe:
+            initialDelaySeconds: 10
+            periodSeconds: 60
+            tcpSocket:
+              port: 8000
+          readinessProbe:
+            initialDelaySeconds: 10
+            periodSeconds: 60
+            tcpSocket:
+              port: 8000
+      restartPolicy: Always
+  selector:
+    matchLabels:
+      app: {{.Values.username}}-dp
+      user: {{.Values.username}}
+  {{end}}

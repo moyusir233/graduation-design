@@ -1,0 +1,39 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: init-cluster
+spec:
+  completions: 1
+  backoffLimit: 20
+  ttlSecondsAfterFinished: 0
+  template:
+    metadata:
+      labels:
+        app: init-cluster
+    spec:
+      restartPolicy: OnFailure
+      volumes:
+        - name: config
+          configMap:
+            name: config
+            items:
+              - key: services.json
+                path: services.json
+              - key: routes.json
+                path: routes.json
+              - key: key_auth_plugin.json
+                path: key_auth_plugin.json
+              - key: resp_transformer_plugin.json
+                path: resp_transformer_plugin.json
+      containers:
+        - name: init-cluster
+          image: moyusir233/graduation-design:init-cluster-client
+          imagePullPolicy: IfNotPresent
+          args:
+            - -gateway_url
+            - http://kong.{{.Values.namespace}}.svc.cluster.local:8001
+            - -i
+            - /etc/app-configs
+          volumeMounts:
+            - mountPath: /etc/app-configs
+              name: config

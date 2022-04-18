@@ -1,0 +1,43 @@
+{{/*
+生成配置收集服务相应的源代码，需要注入一个结构体切片，
+其中每个结构体要包含DeviceClassID字段
+*/}}
+package service
+
+import (
+	"context"
+	pb "gitee.com/moyusir/data-collection/api/dataCollection/v1"
+	"gitee.com/moyusir/data-collection/internal/biz"
+	"github.com/go-kratos/kratos/v2/errors"
+	"github.com/go-kratos/kratos/v2/log"
+	"google.golang.org/grpc/metadata"
+	"io"
+)
+
+const CLIENT_ID_HEADER = "x-client-id"
+
+type ConfigService struct {
+	pb.UnimplementedConfigServer
+	uc      *biz.ConfigUsecase
+	updater *biz.DeviceConfigUpdater
+	logger  *log.Helper
+}
+
+func NewConfigService(uc *biz.ConfigUsecase, updater *biz.DeviceConfigUpdater, logger log.Logger) (*ConfigService, error) {
+	c := &ConfigService{
+		uc:      uc,
+		updater: updater,
+		logger:  log.NewHelper(logger),
+	}
+
+	return c, nil
+}
+
+{{/* 依据注入的结构体切片生成相应的服务代码 */}}
+{{range .}}
+{{template "CreateInitialConfigSaveStream" .DeviceClassID}}
+
+{{template "CreateConfigUpdateStream" .DeviceClassID}}
+
+{{template "UpdateDeviceConfig" .DeviceClassID}}
+{{end}}

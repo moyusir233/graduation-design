@@ -1,0 +1,78 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: compilation-center
+spec:
+  selector:
+    app: compilation-center
+  ports:
+    - port: 9000
+  type: ClusterIP
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: compilation-center
+  labels:
+    app: compilation-center
+spec:
+  replicas: 1
+  template:
+    metadata:
+      name: compilation-center
+      labels:
+        app: compilation-center
+    spec:
+      volumes:
+        - name: protoc
+          hostPath:
+            path: {{.Values.plugins.protoc}}
+            type: File
+        - name: shell
+          configMap:
+            name: shell
+            items:
+              - key: build.sh
+                path: build.sh
+            defaultMode: 0700
+        - name: config
+          configMap:
+            name: config
+            items:
+              - key: compilation-center-config.yaml
+                path: config.yaml
+        - name: data-collection-template
+          configMap:
+            name: data-collection-template
+        - name: data-processing-template
+          configMap:
+            name: data-processing-template
+      containers:
+        - name: compilation-center
+          image: moyusir233/graduation-design:compilation-center-influxdb
+          imagePullPolicy: IfNotPresent
+          volumeMounts:
+            - mountPath: /bin/protoc
+              name: protoc
+            - mountPath: /shell
+              name: shell
+            - mountPath: /etc/app-configs
+              name: config
+            - mountPath: /etc/data-collection-template
+              name: data-collection-template
+            - mountPath: /etc/data-processing-template
+              name: data-processing-template
+          ports:
+            - containerPort: 9000
+          readinessProbe:
+            periodSeconds: 30
+            tcpSocket:
+              port: 9000
+          livenessProbe:
+            periodSeconds: 30
+            tcpSocket:
+              port: 9000
+      restartPolicy: Always
+  selector:
+    matchLabels:
+      app: compilation-center

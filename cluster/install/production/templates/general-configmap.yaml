@@ -1,0 +1,38 @@
+# 拉取代码仓库的ssh公钥
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: key
+data:
+  {{- (.Files.Glob "key/*").AsConfig | nindent 2 }}
+---
+# 测试用的脚本
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: shell
+data:
+  {{- (.Files.Glob "shell/*").AsConfig | nindent 2 }}
+---
+# 测试用的配置文件
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: config
+data:
+  {{- (.Files.Glob "config/*").AsConfig | nindent 2 }}
+---
+# 运行编译中心所需的代码模板
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: data-collection-template
+data:
+  {{- (.Files.Glob "data-collection-template/*").AsConfig | nindent 2 }}
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: data-processing-template
+data:
+  {{- (.Files.Glob "data-processing-template/*").AsConfig | nindent 2 }}

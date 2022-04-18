@@ -1,0 +1,26 @@
+server:
+  grpc:
+    addr: 0.0.0.0:9000
+    timeout: 600s
+service:
+  codeGenerator:
+    dataCollectionTmplRoot: /etc/data-collection-template
+    dataProcessingTmplRoot: /etc/data-processing-template
+  compiler:
+    timeout: 600s
+    dataCollection:
+      projectDir: /var/data-collection
+      apiDir: api/dataCollection/v1
+      serviceDir: internal/service
+    dataProcessing:
+      projectDir: /var/data-processing
+      apiDir: api/dataProcessing/v1
+      serviceDir: internal/service
+data:
+  redis:
+    host: network-manage-redis.production.svc.cluster.local
+    serverPort: 6379
+    sentinelPort: 26379
+    masterName: mymaster
+    poolSize: 5
+    minIdleConns: 2

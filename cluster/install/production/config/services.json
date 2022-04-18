@@ -1,0 +1,19 @@
+[
+  {
+    "name": "service-center",
+    "enabled": true,
+    "write_timeout": 600000,
+    "read_timeout": 600000,
+    "url": "http://service-center.production.svc.cluster.local:8000"
+  },
+  {
+    "name": "nginx-options",
+    "enabled": true,
+    "url": "http://nginx.production.svc.cluster.local:80/options"
+  },
+  {
+    "name": "nginx",
+    "enabled": true,
+    "url": "http://nginx.production.svc.cluster.local:80"
+  }
+]
