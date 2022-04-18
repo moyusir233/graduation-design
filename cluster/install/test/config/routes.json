@@ -41,7 +41,7 @@
     }
   },
   {
-    "name": "nginx",
+    "name": "nginx-options",
     "protocols": [
       "http"
     ],
@@ -53,6 +53,25 @@
     ],
     "paths": [
       "/"
+    ],
+    "strip_path": true,
+    "service": {
+      "name": "nginx-options"
+    }
+  },
+  {
+    "name": "nginx",
+    "protocols": [
+      "http"
+    ],
+    "methods": [
+      "GET"
+    ],
+    "hosts": [
+      "gd-k8s-master01"
+    ],
+    "paths": [
+      "/static/"
     ],
     "strip_path": true,
     "service": {

@@ -40,7 +40,7 @@ spec:
       volumes:
         - name: protoc
           hostPath:
-            path: /root/k8s-install/protobuf/protoc
+            path: {{.Values.plugins.protoc}}
             type: File
         - name: key
           configMap:

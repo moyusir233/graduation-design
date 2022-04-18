@@ -31,19 +31,21 @@ spec:
           ports:
             - containerPort: 8086
           # 设置初始化influxdb需要的环境变量
+          {{with .Values.influxdb}}
           env:
             - name: DOCKER_INFLUXDB_INIT_MODE
               value: setup
             - name: DOCKER_INFLUXDB_INIT_USERNAME
-              value: test
+              value: {{.user}}
             - name: DOCKER_INFLUXDB_INIT_PASSWORD
-              value: testPassword123
+              value: {{.password}}
             - name: DOCKER_INFLUXDB_INIT_ORG
-              value: test
+              value: {{.org}}
             - name: DOCKER_INFLUXDB_INIT_BUCKET
-              value: init_bucket
+              value: {{.initBucket}}
             - name: DOCKER_INFLUXDB_INIT_ADMIN_TOKEN
-              value: test
+              value: {{.initAuthToken}}
+          {{end}}
           readinessProbe:
             httpGet:
               port: 8086

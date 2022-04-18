@@ -7,16 +7,28 @@ kongDatabase:
   user: kong
   password: kongpass
   dbName: kong
+
 kong:
   name: kong
+
+plugins:
+  protoc: /root/k8s-install/protobuf/protoc
+
+influxdb:
+  user: test
+  password: testPassword123
+  org: test
+  initBucket: init_bucket
+  initAuthToken: test
+
 # 配置测试用的服务器是否需要开启
 testServer:
   grpc: false # 测试用
   websocket: false # 测试用
-  autoTestServer: true #测试用
-  nginx: false # 处理预检请求和存储前端文件
-  kong: false # api网关
-  compilationCenter: false # 编译中心，负责为用户容器启动时编译生成的服务代码
-  serviceCenter: false # 服务中心，负责处理用户的登录、注册、注销、下载客户端代码的请求
-  initCluster: false # 初始化集群，主要是注册服务中心、nginx的外部路由
-  influxdb: false # 存储时序数据的数据库
+  autoTestServer: false #测试用
+  nginx: true # 处理预检请求和存储前端文件
+  kong: true # api网关
+  compilationCenter: true # 编译中心，负责为用户容器启动时编译生成的服务代码
+  serviceCenter: true #T 服务中心，负责处理用户的登录、注册、注销、下载客户端代码的请求
+  initCluster: true # 初始化集群，主要是注册服务中心、nginx的外部路由
+  influxdb: true # 存储时序数据的数据库
