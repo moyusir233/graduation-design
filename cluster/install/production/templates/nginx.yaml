@@ -22,6 +22,8 @@ spec:
     metadata:
       labels:
         app: nginx
+      annotations:
+        co.elastic.logs/module: nginx
     spec:
       volumes:
         - name: config

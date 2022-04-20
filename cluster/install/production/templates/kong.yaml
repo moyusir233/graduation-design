@@ -44,6 +44,8 @@ spec:
       name: {{.Values.kong.name}}
       labels:
         app: kong
+      annotations:
+        co.elastic.logs/module: nginx
     spec:
       initContainers:
         - name: init-kong-database

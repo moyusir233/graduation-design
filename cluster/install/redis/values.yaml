@@ -294,7 +294,8 @@ master:
   ## @param master.podAnnotations Annotations for Redis&trade; master pods
   ## ref: https://kubernetes.io/docs/concepts/overview/working-with-objects/annotations/
   ##
-  podAnnotations: {}
+  podAnnotations:
+      co.elastic.logs/module: redis
   ## @param master.shareProcessNamespace Share a single process namespace between all of the containers in Redis&trade; master pods
   ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/share-process-namespace/
   ##
@@ -653,7 +654,8 @@ replica:
   ## @param replica.podAnnotations Annotations for Redis&trade; replicas pods
   ## ref: https://kubernetes.io/docs/concepts/overview/working-with-objects/annotations/
   ##
-  podAnnotations: {}
+  podAnnotations:
+    co.elastic.logs/module: redis
   ## @param replica.shareProcessNamespace Share a single process namespace between all of the containers in Redis&trade; replicas pods
   ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/share-process-namespace/
   ##
