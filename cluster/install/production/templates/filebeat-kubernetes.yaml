@@ -12,21 +12,72 @@ data:
       providers:
         - type: kubernetes
           node: ${NODE_NAME}
-          hints.enabled: true
-          hints.default_config:
-            type: container
-            paths:
-              - /var/log/containers/*${data.kubernetes.container.id}.log
-
-    processors:
-      - add_cloud_metadata:
-      - add_host_metadata:
+          templates:
+            # 处理所有应用容器之外的系统容器的日志配置
+            - condition:
+                not:
+                  has_fields: [ "kubernetes.labels.logger" ]
+              config:
+                - type: container
+                  paths:
+                    - "/var/log/containers/*-${data.kubernetes.container.id}.log"
+            # 处理所有应用容器的日志配置
+            - condition:
+                equals:
+                  kubernetes.labels.logger: "json"
+              config:
+                - type: container
+                  paths:
+                    - "/var/log/containers/*-${data.kubernetes.container.id}.log"
+                  json.keys_under_root: true
+                  json.add_error_key: true
+                  json.message_key: message
+                  json.expand_keys: true
+                  # 处理函数调用的processors，将函数调用的opeartion信息字段添加到message中
+                  processors:
+                    - drop_fields:
+                        when:
+                          equals:
+                            message: ""
+                        fields: [ "message"]
+                        ignore_missing: false
+                    - copy_fields:
+                        when:
+                          not:
+                            has_fields: [ "message" ]
+                        fields:
+                          - from: operation
+                            to: message
+                        fail_on_error: true
+                        ignore_missing: true
+            # 处理nginx的日志配置
+            - condition:
+                equals:
+                  kubernetes.labels.logger: "nginx"
+              config:
+                - module: nginx
+                  log:
+                    input:
+                      type: container
+                      paths:
+                        - "/var/log/containers/*-${data.kubernetes.container.id}.log"
+            # 处理redis的日志配置
+            - condition:
+                equals:
+                  kubernetes.labels.logger: "redis"
+              config:
+                - module: redis
+                  log:
+                    input:
+                      type: container
+                      paths:
+                        - "/var/log/containers/*-${data.kubernetes.container.id}.log"
 
     cloud.id: ${ELASTIC_CLOUD_ID}
     cloud.auth: ${ELASTIC_CLOUD_AUTH}
 
     output.elasticsearch:
-      hosts: ['${ELASTICSEARCH_HOST:elasticsearch}:${ELASTICSEARCH_PORT:9200}']
+      hosts: [ '${ELASTICSEARCH_HOST:elasticsearch}:${ELASTICSEARCH_PORT:9200}' ]
       username: ${ELASTICSEARCH_USERNAME}
       password: ${ELASTICSEARCH_PASSWORD}
 ---
@@ -159,7 +210,7 @@ metadata:
   labels:
     k8s-app: filebeat
 rules:
-  - apiGroups: [""] # "" indicates the core API group
+  - apiGroups: [ "" ] # "" indicates the core API group
     resources:
       - namespaces
       - pods
@@ -168,10 +219,10 @@ rules:
       - get
       - watch
       - list
-  - apiGroups: ["apps"]
+  - apiGroups: [ "apps" ]
     resources:
       - replicasets
-    verbs: ["get", "list", "watch"]
+    verbs: [ "get", "list", "watch" ]
 ---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: Role
@@ -186,7 +237,7 @@ rules:
       - coordination.k8s.io
     resources:
       - leases
-    verbs: ["get", "create", "update"]
+    verbs: [ "get", "create", "update" ]
 ---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: Role
@@ -196,12 +247,12 @@ metadata:
   labels:
     k8s-app: filebeat
 rules:
-  - apiGroups: [""]
+  - apiGroups: [ "" ]
     resources:
       - configmaps
     resourceNames:
       - kubeadm-config
-    verbs: ["get"]
+    verbs: [ "get" ]
 ---
 apiVersion: v1
 kind: ServiceAccount

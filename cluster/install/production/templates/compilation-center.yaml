@@ -22,11 +22,7 @@ spec:
       name: compilation-center
       labels:
         app: compilation-center
-      annotations:
-        co.elastic.logs.compilation-center/json.keys_under_root: "true"
-        co.elastic.logs.compilation-center/json.add_error_key: "true"
-        co.elastic.logs.compilation-center/json.message_key: "message"
-        co.elastic.logs.compilation-center/json.expand_keys: "true"
+        logger: json
     spec:
       volumes:
         - name: protoc
