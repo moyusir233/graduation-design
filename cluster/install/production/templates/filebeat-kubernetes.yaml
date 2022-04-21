@@ -35,28 +35,26 @@ data:
                   json.expand_keys: true
                   # 处理函数调用的processors，将函数调用的opeartion信息字段添加到message中
                   processors:
-                    - drop_fields:
-                        when:
-                          equals:
-                            message: ""
-                        fields: [ "message"]
-                        ignore_missing: false
-                    - copy_fields:
-                        when:
-                          not:
-                            has_fields: [ "message" ]
-                        fields:
-                          - from: operation
-                            to: message
-                        fail_on_error: true
-                        ignore_missing: true
+                    - if:
+                        equals:
+                          message: ""
+                      then:
+                        - drop_fields:
+                            fields: [ "message"]
+                            ignore_missing: false
+                        - copy_fields:
+                            fields:
+                              - from: operation
+                                to: message
+                            fail_on_error: true
+                            ignore_missing: true
             # 处理nginx的日志配置
             - condition:
                 equals:
                   kubernetes.labels.logger: "nginx"
               config:
                 - module: nginx
-                  log:
+                  access:
                     input:
                       type: container
                       paths:
