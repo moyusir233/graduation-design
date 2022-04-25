@@ -44,6 +44,7 @@ spec:
       name: {{.Values.kong.name}}
       labels:
         app: kong
+        logger: nginx
     spec:
       initContainers:
         - name: init-kong-database

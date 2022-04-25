@@ -1,7 +1,8 @@
+logLevel: INFO
 server:
   http:
     addr: 0.0.0.0:8000
-    timeout: 60s
+    timeout: 300s
 data:
   redis:
     host: network-manage-redis.production.svc.cluster.local

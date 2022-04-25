@@ -290,7 +290,8 @@ master:
   ## @param master.podLabels Extra labels for Redis&trade; master pods
   ## ref: https://kubernetes.io/docs/concepts/overview/working-with-objects/labels/
   ##
-  podLabels: {}
+  podLabels:
+    logger: redis
   ## @param master.podAnnotations Annotations for Redis&trade; master pods
   ## ref: https://kubernetes.io/docs/concepts/overview/working-with-objects/annotations/
   ##
@@ -649,7 +650,8 @@ replica:
   ## @param replica.podLabels Extra labels for Redis&trade; replicas pods
   ## ref: https://kubernetes.io/docs/concepts/overview/working-with-objects/labels/
   ##
-  podLabels: {}
+  podLabels:
+    logger: redis
   ## @param replica.podAnnotations Annotations for Redis&trade; replicas pods
   ## ref: https://kubernetes.io/docs/concepts/overview/working-with-objects/annotations/
   ##

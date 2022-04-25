@@ -22,6 +22,7 @@ spec:
     metadata:
       labels:
         app: nginx
+        logger: nginx
     spec:
       volumes:
         - name: config

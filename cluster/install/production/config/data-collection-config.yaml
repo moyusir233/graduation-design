@@ -1,11 +1,12 @@
+logLevel: INFO
 server:
   http:
     addr: 0.0.0.0:8000
-    timeout: 60s
+    timeout: 300s
     port: 8000
   grpc:
     addr: 0.0.0.0:9000
-    timeout: 60s
+    timeout: 300s
     maxIdleTime: 300s
 data:
   redis:

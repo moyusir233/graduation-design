@@ -8,7 +8,7 @@ spec:
     app: influxdb
   ports:
     - port: 8086
-  type: ClusterIP
+  type: NodePort
 ---
 apiVersion: apps/v1
 kind: Deployment
