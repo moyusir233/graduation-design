@@ -26,3 +26,6 @@ dependencies:
   - name: redis
     version: 16.4.0
     repository: "file://../redis"
+  - name: metrics-server
+    version: 3.8.2
+    repository: "file://../metrics-server"

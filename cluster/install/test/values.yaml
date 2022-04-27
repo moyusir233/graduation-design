@@ -21,6 +21,9 @@ influxdb:
   initBucket: init_bucket
   initAuthToken: test
 
+serviceCenter:
+  cpuLimit: 10m
+
 # 配置测试用的服务器是否需要开启
 testServer:
   grpc: false # 测试用
@@ -31,4 +34,4 @@ testServer:
   compilationCenter: false # 编译中心，负责为用户容器启动时编译生成的服务代码
   serviceCenter: false #T 服务中心，负责处理用户的登录、注册、注销、下载客户端代码的请求
   initCluster: false # 初始化集群，主要是注册服务中心、nginx的外部路由
-  influxdb: true # 存储时序数据的数据库
+  influxdb: false # 存储时序数据的数据库

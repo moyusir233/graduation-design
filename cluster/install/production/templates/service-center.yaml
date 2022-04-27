@@ -52,3 +52,25 @@ spec:
   selector:
     matchLabels:
       app: service-center
+---
+# 控制每个service-center pod cpu使用量的hpa
+apiVersion: autoscaling/v2beta2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: hpa
+  labels:
+    app: hpa
+spec:
+  minReplicas: 1
+  maxReplicas: 10
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: service-center
+  metrics:
+    - type: Resource
+      resource:
+        name: cpu
+        target:
+          type: AverageValue
+          averageValue: {{.Values.serviceCenter.cpuLimit}}

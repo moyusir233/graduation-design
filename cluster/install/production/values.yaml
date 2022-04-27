@@ -19,3 +19,5 @@ influxdb:
   org: test
   initBucket: init_bucket
   initAuthToken: test
+serviceCenter:
+  cpuLimit: 10m
