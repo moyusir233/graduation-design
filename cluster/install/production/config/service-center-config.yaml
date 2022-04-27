@@ -17,6 +17,14 @@ server:
     serverUrl: http://influxdb.production.svc.cluster.local:8086
     authToken: test
     org: test
+  serviceDeployConfig:
+    dataCollection:
+      min_replica: 1
+      max_replica: 10
+      cpu_limit: 5m
+      replica: 2
+    dataProcessing:
+      replica: 1
 data:
   redis:
     host: network-manage-redis.production.svc.cluster.local

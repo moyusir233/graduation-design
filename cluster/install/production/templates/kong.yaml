@@ -96,7 +96,7 @@ spec:
           readinessProbe:
             httpGet:
               port: 8001
-              path: /services
+              path: /services?tags=unknown
             initialDelaySeconds: 20
             periodSeconds: 60
       restartPolicy: Always
